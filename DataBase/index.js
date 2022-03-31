@@ -12,7 +12,7 @@ let books = [
     {
       ISBN: "12345Two",
       title: "Getting started with Python",
-      authors: [1, 2],
+      authors: [3, 4],
       language: "en",
       pubDate: "2021-07-07",
       numOfPage: 225,
