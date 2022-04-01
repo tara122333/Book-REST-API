@@ -1,16 +1,32 @@
 const { response, json } = require("express");
+require("dotenv").config();
 const express =require("express");
 
+const mongoose = require("mongoose");
+
 const database = require("./DataBase/index.js");
-
-
 const tara = express();
+
+mongoose.connect(
+    process.env.MONGO___URL,
+    {
+        // useNewUrlParser: true,
+        // useUnifiedTopology: true,
+        // useFindAndModify: false,
+        // useCreateIndex: true,
+    }
+).then(()=>console.log("Connection established 😎😎"));
+
 
 //root
 
 tara.get("/",(request,response)=>{
     return response.json({tara : database});
 });
+
+//connection DataBase
+
+
 
 
 /*
@@ -157,6 +173,8 @@ tara.get("/publication/book/:isbn",(req,res)=>{
 });
 
 
+
+//------------------------------------------------------------------------------------
 
 // server Listen
 tara.listen(3000,()=>{
