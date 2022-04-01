@@ -1,31 +1,40 @@
 const { response, json } = require("express");
+//environment
 require("dotenv").config();
+
+//import MongoDb file
+const BookModule = require("./DataBase/books");
+const AuthorModule = require("./DataBase/authors");
+const PublicationModule = require("./DataBase/publications");
+
+
+
+// import express
 const express =require("express");
 
+// import mongoose
 const mongoose = require("mongoose");
+const { add } = require("nodemon/lib/rules");
 
-const database = require("./DataBase/index.js");
+//import localDataBase
+// const database = require("./DataBase/index.js");
+
+// name of app
 const tara = express();
+tara.use(express.json());
 
+// connection DataBase
 mongoose.connect(
     process.env.MONGO___URL,
-    {
-        // useNewUrlParser: true,
-        // useUnifiedTopology: true,
-        // useFindAndModify: false,
-        // useCreateIndex: true,
-    }
 ).then(()=>console.log("Connection established 😎😎"));
 
 
 //root
 
-tara.get("/",(request,response)=>{
-    return response.json({tara : database});
+tara.get("/", async (request,response)=>{
+    const getAllBooksData = await BookModule.find();
+    return response.json(getAllBooksData);
 });
-
-//connection DataBase
-
 
 
 
@@ -36,14 +45,24 @@ Access          PUBLIC
 Parameter       isbn
 Methods         GET
 */
-tara.get("/is/:isbn",(req,res)=>{
-    const getBooksISBN = database.books.filter((book)=>book.ISBN===req.params.isbn);
-    if(getBooksISBN.length===0){
-        return res.json({error : "There is no ISBN availabasubdu"});
-    }
-    return res.json({book : getBooksISBN});
+tara.get("/is/:isbn",async (req,res)=>{
 
+    // localDatabase
+    // const getBooksISBN = database.books.filter((book)=>book.ISBN===req.params.isbn);
+    
+    // if(getBooksISBN.length===0){
+    //     return res.json({error : "There is no ISBN availabasubdu"});
+    // }
+
+    // MongoDataBase
+    const getBooksISBN = await BookModule.findOne({ISBN:req.params.isbn});
+    if(!getBooksISBN) return res.json({error : "There is no ISBN availabasubdu"});
+
+    return res.json({book : getBooksISBN});
 });
+
+
+
 
 /*
 Route           /c
@@ -52,11 +71,15 @@ Access          PUBLIC
 Parameter       category
 Methods         GET
 */
-tara.get("/c/:category",(req,res)=>{
-    const getSpecificBook = database.books.filter((book)=>book.category.includes(req.params.category));
-    if(getSpecificBook.length===0){
-        return res.json({error : "There is no category of book"});
-    }
+tara.get("/c/:category",async (req,res)=>{
+    // local DataBase
+    // const getSpecificBook = database.books.filter((book)=>book.category.includes(req.params.category));
+    // if(getSpecificBook.length===0){
+    //     return res.json({error : "There is no category of book"});
+    // }
+    const getSpecificBook = await BookModule.findOne({category:req.params.category});
+    if(!getSpecificBook) return res.json({error : "There is no category of book"});
+
     return res.json({book : getSpecificBook});
 });
 
@@ -69,11 +92,18 @@ Parameter       authors
 Methods         GET
 */
 
-tara.get("/a/:authors",(req,res)=>{
-    const getAuthorBook = database.books.filter((book)=>book.authors.includes(JSON.parse(req.params.authors)));
-    if(getAuthorBook.length===0){
-        return res.json({error : "There is no value find"});
-    }
+tara.get("/a/:authors",async (req,res)=>{
+
+    // localDatabase
+    // const getAuthorBook = database.books.filter((book)=>book.authors.includes(JSON.parse(req.params.authors)));
+    // if(getAuthorBook.length===0){
+    //     return res.json({error : "There is no value find"});
+    // }
+
+    // MongoDataBase
+    const getAuthorBook = await BookModule.findOne({authors:req.params.authors});
+    if(!getAuthorBook) return res.json({error : "There is no Author Book find"});
+
     return res.json({Books : getAuthorBook});
 });
 
@@ -86,12 +116,14 @@ Parameter       NONE
 Methods         GET
 */
 
-tara.get("/author",(req,res)=>{
-    const getAuthorData = database.authors;
-    return res.json({Author : getAuthorData});
+tara.get("/author",async (req,res)=>{
+    //localDataBase
+    // const getAuthorData = database.authors;
+    const getAuthorBookData = await AuthorModule.find();
+    if(!getAuthorBookData) return res.json({error : "No Author Data Find"});
+
+    return res.json({Author : getAuthorBookData});
 });
-
-
 
 
 /*
@@ -101,6 +133,7 @@ Access          PUBLIC
 Parameter       isbn
 Methods         GET
 */
+
 tara.get("/author/:name",(req,res)=>{
     const getAuthorName = database.authors.filter((name)=>name.name===req.params.name);
     if(getAuthorName.length===0){
@@ -118,6 +151,7 @@ Access          PUBLIC
 Parameter       isbn
 Methods         GET
 */
+
 tara.get("/author/book/:isbn",(req,res)=>{
     const getAuthorBookData = database.authors.filter((author)=>author.books.includes(req.params.isbn));
     if(getAuthorBookData.length===0){
@@ -134,6 +168,7 @@ Access          PUBLIC
 Parameter       NONE
 Methods         GET
 */
+
 tara.get("/publication",(req,res)=>{
     const getPublicationData = database.publications;
     return res.json({Publication : getPublicationData});
@@ -156,7 +191,6 @@ tara.get("/publication/:id",(req,res)=>{
 });
 
 
-
 /*
 Route           /publication/book
 Description     get all publication based on books
@@ -172,9 +206,21 @@ tara.get("/publication/book/:isbn",(req,res)=>{
     return res.json({Publication : getSpecificISBNPublicationData});
 });
 
-
-
 //------------------------------------------------------------------------------------
+
+
+
+///-----------POST METHOD -----------------------
+
+
+tara.post("/book/new",async (req,res)=>{
+
+    const {newBook,} = req.body;
+    const addNewBooks = BookModule.create(newBook);
+    // console.log(addNewBooks);
+    return res.json({books : addNewBooks, message : "book Addede!!!"});
+});
+
 
 // server Listen
 tara.listen(3000,()=>{
