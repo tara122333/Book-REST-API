@@ -128,17 +128,24 @@ tara.get("/author",async (req,res)=>{
 
 /*
 Route           /author
-Description     get all authors based on books
+Description     get specific authors
 Access          PUBLIC
-Parameter       isbn
+Parameter       id
 Methods         GET
 */
 
-tara.get("/author/:name",(req,res)=>{
-    const getAuthorName = database.authors.filter((name)=>name.name===req.params.name);
-    if(getAuthorName.length===0){
-        return res.json({error : "Can not find any specific author name "})
-    }
+tara.get("/author/:id", async (req,res)=>{
+
+    //MongoDb
+    const getAuthorName = await AuthorModule.findOne({id : req.params.id});
+    if(!getAuthorName) return res.json({error : "Can not find any specific author "})
+
+    //localDataBase
+    // const getAuthorName = database.authors.filter((name)=>name.name===req.params.name);
+    // if(getAuthorName.length===0){
+    //     return res.json({error : "Can not find any specific author name "})
+    // }
+
     return res.json({Author : getAuthorName});
 });
 
@@ -152,11 +159,18 @@ Parameter       isbn
 Methods         GET
 */
 
-tara.get("/author/book/:isbn",(req,res)=>{
-    const getAuthorBookData = database.authors.filter((author)=>author.books.includes(req.params.isbn));
-    if(getAuthorBookData.length===0){
-        return res.json({error : "there is no author book data"});
-    }
+tara.get("/author/book/:isbn",async (req,res)=>{
+
+    //MongoDB
+
+    const getAuthorBookData = await AuthorModule.findOne({book:req.params.isbn});
+    if(!getAuthorBookData) return res.json({error : "there is no author book data"});
+
+    //localDataBase
+    // const getAuthorBookData = database.authors.filter((author)=>author.books.includes(req.params.isbn));
+    // if(getAuthorBookData.length===0){
+    //     return res.json({error : "there is no author book data"});
+    // }
     return res.json({Books : getAuthorBookData});
 });
 
@@ -169,24 +183,35 @@ Parameter       NONE
 Methods         GET
 */
 
-tara.get("/publication",(req,res)=>{
-    const getPublicationData = database.publications;
+tara.get("/publication",async (req,res)=>{
+    // MongoDB
+    const getPublicationData = await PublicationModule.find();
+    if(!getPublicationData) return res.json({Error : "There is no All Author Data find"});
+
+    //localDataBase
+    // const getPublicationData = database.publications;
     return res.json({Publication : getPublicationData});
 })
 
 
 /*
 Route           /publication
-Description     get all publication based on books
+Description     get specific publication based id
 Access          PUBLIC
 Parameter       id
 Methods         GET
 */
-tara.get("/publication/:id",(req,res)=>{
-    const getSpecificPublicationData = database.publications.filter((id)=>id.id==req.params.id);
-    if(getSpecificPublicationData.length===0){
-        return res.json({error : "there is no specification Publication Data"});
-    }
+tara.get("/publication/:id",async (req,res)=>{
+
+    //MongoDb
+    const getSpecificPublicationData = await PublicationModule.findOne({id:req.params.id});
+    if(!getSpecificPublicationData) return res.json({Error : "There is no specification Data Based on id"});
+
+    // localDataBase
+    // const getSpecificPublicationData = database.publications.filter((id)=>id.id==req.params.id);
+    // if(getSpecificPublicationData.length===0){
+    //     return res.json({error : "there is no specification Publication Data"});
+    // }
     return res.json({Publication : getSpecificPublicationData});
 });
 
@@ -198,11 +223,16 @@ Access          PUBLIC
 Parameter       isbn
 Methods         GET
 */
-tara.get("/publication/book/:isbn",(req,res)=>{
-    const getSpecificISBNPublicationData = database.publications.filter((publication)=>publication.books.includes(req.params.isbn));
-    if(getSpecificISBNPublicationData.length===0){
-        return res.json({error : "There is not Found Specific Publication Author Book"});
-    }
+tara.get("/publication/book/:isbn",async(req,res)=>{
+
+    // MongoDb
+    const getSpecificISBNPublicationData = await PublicationModule.findOne({books:req.params.isbn});
+    if(!getSpecificISBNPublicationData) return res.json({Error : "There is no specification Data Based on Book"});
+    //localData
+    // const getSpecificISBNPublicationData = database.publications.filter((publication)=>publication.books.includes(req.params.isbn));
+    // if(getSpecificISBNPublicationData.length===0){
+    //     return res.json({error : "There is not Found Specific Publication Author Book"});
+    // }
     return res.json({Publication : getSpecificISBNPublicationData});
 });
 
