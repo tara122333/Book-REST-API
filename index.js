@@ -240,7 +240,7 @@ tara.get("/publication/book/:isbn",async(req,res)=>{
 
 
 
-///-----------POST METHOD -----------------------
+///-----------POST METHOD ---------------------------------------------------
 
 
 tara.post("/book/new",async (req,res)=>{
@@ -251,6 +251,18 @@ tara.post("/book/new",async (req,res)=>{
     return res.json({books : addNewBooks, message : "book Addede!!!"});
 });
 
+
+tara.post("/author/new",async (req,res)=>{
+    const {newAuthor} = req.body;
+    const addNewAuthor = AuthorModule.create(newAuthor);
+    return res.json({author : addNewAuthor, message : "Author Addede!!!"});
+});
+
+tara.post("/publication/new",async (req,res)=>{
+    const {addPublication} = req.body;
+    const addNewPublication = PublicationModule.create(addPublication);
+    return res.json({Publication : addNewPublication, Message : "Publication added!!!"});
+});
 
 // server Listen
 tara.listen(3000,()=>{
