@@ -264,7 +264,26 @@ tara.post("/publication/new",async (req,res)=>{
     return res.json({Publication : addNewPublication, Message : "Publication added!!!"});
 });
 
+
+// =========--------------=========------ PUT Method------==========-----------------=========
+tara.put("/book/update/:isbn",async (req,res)=>{
+    const updateBookDetail = await BookModule.findOneAndUpdate(
+        {
+            ISBN : req.params.isbn,
+        },
+        {
+            title:req.body.updateTitle,
+        },
+        {
+            new:true,
+        },
+
+        );
+        return res.json({Book : updateBookDetail});
+});
+
+
 // server Listen
 tara.listen(3000,()=>{
     console.log("Server has been running on port 3000");
-})
+});
