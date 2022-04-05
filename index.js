@@ -282,6 +282,8 @@ tara.put("/book/update/:isbn",async (req,res)=>{
         return res.json({Book : updateBookDetail});
 });
 
+
+
 tara.put("/book/author/update/:isbn",async (req,res)=>{
     const updateBookAuthor = await BookModule.findOneAndUpdate({
         ISBN:req.params.isbn,
@@ -313,7 +315,26 @@ tara.put("/book/author/update/:isbn",async (req,res)=>{
             Author : updateAuthor,
             Message : "Update Book author and book in author"
         });
-})
+        
+});
+
+
+
+tara.put("/author/update/:id",async (req,res)=>{
+        const updateAuthorName = await AuthorModule.findOneAndUpdate(
+            {
+                id : req.params.id,
+            },
+            {
+                    name : req.body.updateName,
+            },
+            {
+                new:true,
+            },
+        );
+        return res.json({ message: "book was added!" });
+        
+    });
 
 // server Listen
 tara.listen(3000,()=>{
