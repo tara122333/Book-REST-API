@@ -15,6 +15,7 @@ const express =require("express");
 // import mongoose
 const mongoose = require("mongoose");
 const { add } = require("nodemon/lib/rules");
+const { findOneAndUpdate } = require("./DataBase/books");
 
 //import localDataBase
 // const database = require("./DataBase/index.js");
@@ -266,6 +267,7 @@ tara.post("/publication/new",async (req,res)=>{
 
 
 // =========--------------=========------ PUT Method------==========-----------------=========
+
 tara.put("/book/update/:isbn",async (req,res)=>{
     const updateBookDetail = await BookModule.findOneAndUpdate(
         {
@@ -332,9 +334,69 @@ tara.put("/author/update/:id",async (req,res)=>{
                 new:true,
             },
         );
-        return res.json({ message: "book was added!" });
+        return res.json({ message: updateAuthorName });
         
     });
+
+
+
+tara.put("/publication/update/:id",async(req,res)=>{
+    const updatePublication = await PublicationModule.findOneAndUpdate(
+        {
+            id : req.params.id,
+        },
+        {
+            name : req.body.updatePublicationName,
+        },
+        {
+            new:true,
+        },
+    );
+    return res.json({Publication : updatePublication});
+});
+
+
+tara.put("/publication/update/book/:isbn",async(req,res)=>{
+    const updateBook = await BookModule.findOneAndUpdate(
+        {
+            ISBN : req.params.isbn,
+        }
+        ,
+        {
+            publication : req.body.pubID,
+        }
+
+        ,
+        {
+            new:true,
+        }
+        ,
+    );
+
+    const updatePublication = await PublicationModule.findOneAndUpdate(
+        {
+            books : req.params.isbn,
+        },
+        {
+            id:req.body.pubID,
+        },
+        {
+            new:true,
+        },
+    );
+    return res.json({
+        Book : updateBook,
+        Publication : updatePublication,
+        message : "update successfully",
+    });
+});
+
+
+
+
+
+
+
 
 // server Listen
 tara.listen(3000,()=>{
